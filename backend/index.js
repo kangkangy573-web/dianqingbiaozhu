@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,16 @@ app.use('/api/user', userRoutes);
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend service is running' });
+});
+
+// Serve static files from the frontend build directory
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Handle SPA - all routes that don't match API routes should serve index.html
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, '../dist', 'index.html'));
+  }
 });
 
 // Start server
